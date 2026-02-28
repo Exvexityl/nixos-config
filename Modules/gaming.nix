@@ -41,9 +41,20 @@
       enable = true;
       finegrained = true;
     };
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    package = config.boot.kernelPackages.nvidiaPackages.beta;
   };
-
+  services.thermald.enable = true;
+  services.auto-cpufreq.enable = true;
+  services.auto-cpufreq.settings = {
+    battery = {
+       governor = "powersave";
+       turbo = "never";
+    };
+    charger = {
+       governor = "performance";
+       turbo = "auto";
+    };
+  };
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -58,30 +69,6 @@
   };
 
   services.power-profiles-daemon.enable = false;
-
-  services.tlp = {
-    enable = true;
-    settings = {
-      CPU_SCALING_GOVERNOR_ON_AC = "performance";
-      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
-
-      CPU_BOOST_ON_AC = 1;
-      CPU_BOOST_ON_BAT = 0;
-
-      CPU_HWP_DYN_BOOST_ON_AC = 1;
-      CPU_HWP_DYN_BOOST_ON_BAT = 0;
-
-      PLATFORM_PROFILE_ON_AC = "performance";
-      PLATFORM_PROFILE_ON_BAT = "balanced";
-
-      RUNTIME_PM_ON_AC = "on";
-      RUNTIME_PM_ON_BAT = "auto";
-      RUNTIME_PM_DRIVER_BLACKLIST = "nvidia";
-
-      USB_AUTOSUSPEND = 0;
-    };
-  };
-
   environment.systemPackages = [
     pkgs.brightnessctl
     pkgs.gpu-screen-recorder

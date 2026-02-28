@@ -85,24 +85,42 @@
       "audio"
       "input"
       "gamemode"
+      "libvirtd"
     ];
   };
+virtualisation.libvirtd.enable = true;
+virtualisation.libvirtd.qemu = {
+  swtpm.enable = true;
+};
+
+# Enable USB redirection (optional)
+virtualisation.spiceUSBRedirection.enable = true;
   services.fprintd.enable = true;
   environment.systemPackages = with pkgs; [
     wget
     curl
     git
     micro
+    libvirt
+    triton-llvm
+    pipx
     vim
+    exfat
+    exfatprogs
     neovim
+    gparted
     helix
     yazi
     lazygit
     scrot
     xclip
     nitrogen
+    glfw
+    virt-manager
     playerctl
     prettier
+    temurin-jre-bin
+    vllm
     neofetch
     rofi
     dunst
@@ -117,6 +135,7 @@
     better-control
     ulauncher
     unzip
+    gcc
     nautilus
     gnome-tweaks
     gnome-extension-manager
@@ -155,7 +174,7 @@
   };
 
   nixpkgs.config.allowUnfree = true;
-
+  programs.kdeconnect.enable = true;
   nix.gc = {
     automatic = true;
     dates = "weekly";

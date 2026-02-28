@@ -38,6 +38,11 @@
     quickshell
     dunst
     thunar
+    thunar-volman
+    thunar-dropbox-plugin
+    thunar-vcs-plugin
+    thunar-archive-plugin
+    thunar-media-tags-plugin
     firefox
     jq
     brightnessctl
@@ -46,6 +51,7 @@
     wlogout
     flatpak
     swaynotificationcenter
+    matugen
     bluez
     fzf
   ];
