@@ -1,47 +1,59 @@
 {
-  description = "My nixos flake";
+  description = "exvexityl's NixOS flake — KDE + Niri + Home Manager";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-
-    mango = {
-      url = "github:DreamMaoMao/mango";
+    home-manager = {
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    silentSDDM = {
-      url = "github:uiriansan/SilentSDDM";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # CachyOS kernels
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+    # Niri — stable compositor releases
+    niri.url = "github:sodiboo/niri-flake";
+    eden.url = "github:daaboulex/eden-nix";
+
+    # Catppuccin for consistent theming across apps
+    catppuccin.url = "github:catppuccin/nix";
   };
 
-  outputs = { self, nixpkgs, nixos-hardware, mango, ... }@inputs:
-  let
-    system = "x86_64-linux";
-    pkgs = import nixpkgs { inherit system; };
-  in
-  {
-    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      inherit system;
+  outputs =
+    {
+      nixpkgs,
+      eden,
+      home-manager,
+      niri,
+      catppuccin,
+      nix-cachyos-kernel,
+      ...
+    }@inputs:
+    {
+      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
+        modules = [
+          niri.nixosModules.niri
+          home-manager.nixosModules.home-manager
+          catppuccin.nixosModules.catppuccin
+          eden.nixosModules.default
 
-      specialArgs = { inherit inputs; };
+          ./configuration.nix
 
-      modules = [
-        nixos-hardware.nixosModules.dell-precision-5560
-        mango.nixosModules.mango
-        ./hardware-configuration.nix
-        ./configuration.nix
-      ];
+          {
+            home-manager = {
+              useGlobalPkgs = true; # share system nixpkgs — no double eval
+              useUserPackages = true; # install HM packages into /etc/profiles
+              extraSpecialArgs = { inherit inputs; };
+              users.exvexityl = import ./home.nix;
+              sharedModules = [
+                catppuccin.homeManagerModules.catppuccin
+                niri.homeModules.niri
+              ];
+            };
+          }
+        ];
+      };
     };
-
-    devShells.${system}.default = pkgs.mkShell {
-      packages = with pkgs; [
-        python312
-        python312Packages.pip
-        python312Packages.virtualenv
-      ];
-    };
-  };
 }
